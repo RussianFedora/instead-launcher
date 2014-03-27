@@ -1,17 +1,16 @@
 Summary:	Game update/launch program for INSTEAD
 Name:		instead-launcher
 Version:	0.6.1
-Release:	1%{?dist}.R
+Release:	2%{?dist}
 
 URL:		http://instead-launcher.googlecode.com
 License:	GPLv2
 Group:		Amusements/Games
 Source0:	http://instead-launcher.googlecode.com/files/%{name}_%{version}.tar.gz
-Patch0:		instead-launcher-0.6.1-desktop.patch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	qt-devel
 BuildRequires:	zlib-devel
+BuildRequires:	desktop-file-utils
 
 Requires:	instead
 
@@ -21,29 +20,29 @@ INSTEAD games
 
 %prep
 %setup -q
-%patch0 -p1 -b .desktop
 
 %build
-qmake-qt4 PREFIX=/usr
+%qmake_qt4 PREFIX=/usr
 make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
-mkdir -p $RPM_BUILD_ROOT/usr/bin/ $RPM_BUILD_ROOT/usr/share/applications/
-install -m 755 instead-launcher $RPM_BUILD_ROOT/usr/bin/
-install -m 644 -p instead-launcher.desktop $RPM_BUILD_ROOT/usr/share/applications/
-strip $RPM_BUILD_ROOT/usr/bin/%{name}
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+%make_install INSTALL_ROOT=%{buildroot}
+desktop-file-install                       \
+--delete-original                          \
+--set-icon=sdl_instead                     \
+--remove-key=Encoding                      \
+--remove-key=Version                       \
+--dir=%{buildroot}%{_datadir}/applications \
+%{buildroot}/%{_datadir}/applications/%{name}.desktop
 
 %files
-%defattr(-,root,root,-)
 %doc readme.txt
 %{_bindir}/*
 %{_datadir}/applications/*
 
 %changelog
+* Wed Mar 26 2014 Ivan Epifanov <isage.dna@gmail.com> - 0.6.1-2.R
+- Fix debug package and release version
+
 * Sat Nov  5 2011 Arkady L. Shane <ashejn@russianfedora.ru> - 0.6.1-1.R
 - initial build for Fedora
