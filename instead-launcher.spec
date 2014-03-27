@@ -20,6 +20,8 @@ INSTEAD games
 
 %prep
 %setup -q
+#patch default instead path
+sed -e 's/\/usr\/local\/bin\/sdl-instead/\/usr\/bin\/instead/' -i platform.cpp
 
 %build
 %qmake_qt4 PREFIX=/usr
